@@ -1,14 +1,10 @@
-﻿// ****************************************
-// Assembly : NetflixRouletteSharp
-// File     : NetflixRoulette.cs
-// Author   : Alex Camilleri
-// ****************************************
-// Created  : 25/04/2014
-// ****************************************
+﻿//Alan Wright
+// 7/17/14
 
 using System;
 using System.Net;
 using System.Runtime.Serialization.Json;
+using System.Collections.Generic;
 
 namespace NetflixRouletteSharp
 {
@@ -27,9 +23,13 @@ namespace NetflixRouletteSharp
         /// </summary>
         /// <param name="title">The request title.</param>
         /// <returns>RouletteResponse</returns>
-        public static RouletteResponse CreateRequest(string title)
+        public static RouletteResponse TitleRequest(string title)
         {
-            return CreateRequest(title, 0);
+            return CreateRequest(new RouletteRequest
+            {
+                ReqType = RequestType.Title,
+                Title = title
+            });
         }
 
         /// <summary>
@@ -38,12 +38,31 @@ namespace NetflixRouletteSharp
         /// <param name="title">The request title.</param>
         /// <param name="year">The year.</param>
         /// <returns>RouletteResponse</returns>
-        public static RouletteResponse CreateRequest(string title, int year)
+        public static RouletteResponse TitleAndYearRequest(string title, int year)
         {
             return CreateRequest(new RouletteRequest
             {
+                ReqType = RequestType.TitleYear,
                 Title = title,
                 Year = year
+            });
+        }
+
+        public static List<RouletteResponse> ActorRequest(string actor)
+        {
+            return CreateListRequest(new RouletteRequest
+            {
+                ReqType = RequestType.Actor,
+                Actor = actor
+            });
+        }
+
+        public static List<RouletteResponse> DirectorRequest(string director)
+        {
+            return CreateListRequest(new RouletteRequest
+            {
+                ReqType = RequestType.Director,
+                Director = director
             });
         }
 
@@ -67,6 +86,27 @@ namespace NetflixRouletteSharp
                     if (httpWebResp.StatusCode == HttpStatusCode.OK)
                     {
                         return (RouletteResponse) new DataContractJsonSerializer(typeof(RouletteResponse)).ReadObject(httpWebResp.GetResponseStream());
+                    }
+
+                    throw new RouletteRequestException("Unexpected HTTP Status Code ({0}: {1})", httpWebResp.StatusCode, httpWebResp.StatusDescription);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new RouletteRequestException("{0} {1}", exception.Message, requestData.ToString());
+            }
+        }
+
+        public static List<RouletteResponse> CreateListRequest(RouletteRequest requestData)
+        {
+            try
+            {
+                var httpWebReq = (HttpWebRequest) WebRequest.Create(requestData.ApiUrl);
+                using (var httpWebResp = (HttpWebResponse) httpWebReq.GetResponse())
+                {
+                    if (httpWebResp.StatusCode == HttpStatusCode.OK)
+                    {
+                        return (List<RouletteResponse>)new DataContractJsonSerializer(typeof(List<RouletteResponse>)).ReadObject(httpWebResp.GetResponseStream());
                     }
 
                     throw new RouletteRequestException("Unexpected HTTP Status Code ({0}: {1})", httpWebResp.StatusCode, httpWebResp.StatusDescription);

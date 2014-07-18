@@ -1,31 +1,27 @@
 ﻿// ****************************************
-// Assembly : NetflixRouletteSharp
-// File     : RouletteRequest.cs
-// Author   : Alex Camilleri
-// ****************************************
-// Created  : 25/04/2014
-// ****************************************
+// Alan Wright
+// 7/17/14
 
 using System.Text;
 
 namespace NetflixRouletteSharp
 {
-    /// <summary>
-    ///     Class RouletteRequest.
-    /// </summary>
+    public enum RequestType
+    {
+        Title, TitleYear, Director, Actor
+    }
+
     public class RouletteRequest
     {
-        /// <summary>
-        ///     Gets or sets the title.
-        /// </summary>
-        /// <value>The title.</value>
         public string Title { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the year.
-        /// </summary>
-        /// <value>The year.</value>
         public int Year { get; set; }
+
+        public string Director { get; set; }
+
+        public string Actor { get; set; }
+
+        public RequestType ReqType { get; set; }
 
         /// <summary>
         ///     Returns a formatted API URL containing the request information.
@@ -36,23 +32,19 @@ namespace NetflixRouletteSharp
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(Title))
+                switch (ReqType)
                 {
-                    throw new RouletteRequestException("The request title cannot be null or white space. {0}", ToString());
+                    case RequestType.Title:
+                        return new StringBuilder(NetflixRoulette.API_URL).AppendFormat("title={0}", Title.Replace(" ", "%20")).ToString();
+                    case RequestType.TitleYear:
+                        return new StringBuilder(NetflixRoulette.API_URL).AppendFormat("title={0}&year={1}", Title.Replace(" ", "%20"), Year).ToString();
+                    case RequestType.Actor:
+                        return new StringBuilder(NetflixRoulette.API_URL).AppendFormat("actor={0}", Actor.Replace(" ", "%20"), Year).ToString();
+                    case RequestType.Director:
+                        return new StringBuilder(NetflixRoulette.API_URL).AppendFormat("director={0}", Director.Replace(" ", "%20"), Year).ToString();
                 }
-
-                var stringBuilder = new StringBuilder(NetflixRoulette.API_URL).AppendFormat("title={0}", Title.Replace(" ", "%20"));
-                return (Year > 0 ? stringBuilder.AppendFormat("&year={0}", Year) : stringBuilder).ToString();
+                return null;
             }
-        }
-
-        /// <summary>
-        ///     Returns a string that represents the current object.
-        /// </summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString()
-        {
-            return string.Format("RouletteRequest(Title = \"{0}\", Year = {1})", Title, Year);
         }
     }
 }
