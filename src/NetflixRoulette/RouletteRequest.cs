@@ -1,5 +1,4 @@
-﻿// ****************************************
-// Alan Wright
+﻿// Alan Wright
 // 7/17/14
 
 using System.Text;

@@ -8,14 +8,8 @@ using System.Collections.Generic;
 
 namespace NetflixRouletteSharp
 {
-    /// <summary>
-    ///     Class NetflixRoulette.
-    /// </summary>
     public class NetflixRoulette
     {
-        /// <summary>
-        ///     The NetflixRoulette API URL;
-        /// </summary>
         public const string API_URL = "http://netflixroulette.net/api/api.php?";
 
         /// <summary>
@@ -48,6 +42,11 @@ namespace NetflixRouletteSharp
             });
         }
 
+        /// <summary>
+        ///     Creates a request with the specified <paramref name="actor" /> value.
+        /// </summary>
+        /// <param name="actor">The actor.</param>
+        /// <returns>List<RouletteResponse></returns>
         public static List<RouletteResponse> ActorRequest(string actor)
         {
             return CreateListRequest(new RouletteRequest
@@ -57,6 +56,11 @@ namespace NetflixRouletteSharp
             });
         }
 
+        /// <summary>
+        ///     Creates a request with the specified <paramref name="director" /> value.
+        /// </summary>
+        /// <param name="director">The director.</param>
+        /// <returns>List<RouletteResponse></returns>
         public static List<RouletteResponse> DirectorRequest(string director)
         {
             return CreateListRequest(new RouletteRequest
@@ -97,6 +101,17 @@ namespace NetflixRouletteSharp
             }
         }
 
+        /// <summary>
+        ///     Creates a request with the values specified in the <paramref name="requestData" /> object.
+        ///     Returns a list of RouletteResponses (movies). 
+        /// </summary>
+        /// <param name="requestData">The request data.</param>
+        /// <returns>List<RouletteResponse></returns>
+        /// <exception cref="T:NetflixRoulette.RouletteRequestException">
+        ///     The HTTP request returned a Bad Request status code
+        ///     or
+        ///     An Exception was caught while creating the HTTP request.
+        /// </exception>
         public static List<RouletteResponse> CreateListRequest(RouletteRequest requestData)
         {
             try
